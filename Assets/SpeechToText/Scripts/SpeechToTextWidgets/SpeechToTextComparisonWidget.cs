@@ -74,7 +74,6 @@ namespace UnitySpeechToText.Widgets
         {
 			m_SpeechToTextServiceWidgets = Object.FindObjectOfType (typeof(SpeechToTextServiceWidget)) as SpeechToTextServiceWidget;
             RegisterSpeechToTextServiceWidgetsCallbacks();
-			StartCoroutine (StartRecordingTimer ());
 
 
         }
