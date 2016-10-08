@@ -5,9 +5,9 @@ using UnityEngine.Events;
 
 public class OnGazeAction : MonoBehaviour , IPointerEnterHandler,IPointerExitHandler,IPointerClickHandler {
 
-	public UnityEvent OnClick ();
-	public UnityEvent OnEnter ();
-	public UnityEvent OnExit ();
+	public UnityEvent OnClick;
+	public UnityEvent OnEnter;
+	public UnityEvent OnExit;
 
 
 	public void OnPointerClick(PointerEventData data){
