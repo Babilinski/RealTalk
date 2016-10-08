@@ -42,7 +42,7 @@ namespace UnitySpeechToText.Widgets
         /// </summary>
         HashSet<SpeechToTextServiceWidget> m_WaitingSpeechToTextServiceWidgets = new HashSet<SpeechToTextServiceWidget>();
 
-		public string CheckedPhrase;
+		public string[] CheckedPhrase;
 
         /// <summary>
         /// Number of seconds to wait for all responses after recording
@@ -72,6 +72,7 @@ namespace UnitySpeechToText.Widgets
         {
 			m_SpeechToTextServiceWidgets = Object.FindObjectOfType (typeof(SpeechToTextServiceWidget)) as SpeechToTextServiceWidget;
             RegisterSpeechToTextServiceWidgetsCallbacks();
+			StartCoroutine (StartRecordingTimer ());
 
 
         }
@@ -207,7 +208,7 @@ namespace UnitySpeechToText.Widgets
                 Invoke("FinishComparisonSession", m_ResponsesTimeoutInSeconds);
 
                 // If a phrase is selected, pass it to the SpeechToTextServiceWidget.
-				string comparisonPhrase = CheckedPhrase;
+				string[] comparisonPhrase = CheckedPhrase;
 				m_SpeechToTextServiceWidgets.StopRecording (comparisonPhrase);
               
             }

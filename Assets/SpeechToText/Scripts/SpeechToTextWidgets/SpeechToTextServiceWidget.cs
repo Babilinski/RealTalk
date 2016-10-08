@@ -27,7 +27,7 @@ namespace UnitySpeechToText.Widgets
         Text m_ResultsTextUI;
        
 		public string results;
-		public float speechAccuracy; 
+		public List<float> speechAccuracy = new List<float>(); 
 
         /// <summary>
         /// All the final results that have already been determined in the current recording session
@@ -50,7 +50,7 @@ namespace UnitySpeechToText.Widgets
         /// <summary>
         /// Text to compare the final speech-to-text result against
         /// </summary>
-        string m_ComparisonPhrase;
+        string[] m_ComparisonPhrase;
         /// <summary>
         /// Set of leading characters for words to ignore when computing accuracy, which includes '%' by default
         /// to account for Watson's "%HESITATION" in results
@@ -211,7 +211,7 @@ namespace UnitySpeechToText.Widgets
         /// the service is guaranteed to send a final result or error after or before some defined amount of time has passed.
         /// </summary>
         /// <param name="comparisonPhrase">Optional text to compare the speech-to-text result against</param>
-        public void StopRecording(string comparisonPhrase)
+        public void StopRecording(string[] comparisonPhrase)
         {
             m_ComparisonPhrase = comparisonPhrase;
             if (m_LastResultWasFinal)
@@ -280,23 +280,30 @@ namespace UnitySpeechToText.Widgets
         /// the Levenshtein Distance between the two strings, and displays this percentage in the results text UI.
         /// </summary>
         /// <param name="originalPhrase">The phrase to compare against</param>
-        void DisplayAccuracyOfEndResults(string originalPhrase)
+        void DisplayAccuracyOfEndResults(string[] originalPhrase)
         {
 			print ("The computer understood " + results);
 			string speechToTextResult = StringUtilities.TrimSpecialFormatting(results, new HashSet<char>(),
                 m_LeadingCharsForSpecialWords, m_SurroundingCharsForSpecialText);
-            originalPhrase = StringUtilities.TrimSpecialFormatting(originalPhrase, new HashSet<char>(),
-                m_LeadingCharsForSpecialWords, m_SurroundingCharsForSpecialText);
 
-            int levenDistance = StringUtilities.LevenshteinDistance(speechToTextResult, originalPhrase);
-            SmartLogger.Log(DebugFlags.SpeechToTextWidgets, m_SpeechToTextService.GetType().ToString() + " compute accuracy of text: \"" + speechToTextResult + "\"");
-            float accuracy = Mathf.Max(0, 100f - (100f * (float)levenDistance / (float)originalPhrase.Length));
-            m_PreviousFinalResults = "[Accuracy: " + accuracy + "%] " + m_PreviousFinalResults;
+			for (int i = 0; i < originalPhrase.Length; i++) {
+				
+				originalPhrase[i] = StringUtilities.TrimSpecialFormatting(originalPhrase[i], new HashSet<char>(),
+					m_LeadingCharsForSpecialWords, m_SurroundingCharsForSpecialText);
+
+				int levenDistance = StringUtilities.LevenshteinDistance(speechToTextResult, originalPhrase[i]);
+				SmartLogger.Log(DebugFlags.SpeechToTextWidgets, m_SpeechToTextService.GetType().ToString() + " compute accuracy of text: \"" + speechToTextResult + "\"");
+				float accuracy = Mathf.Max(0, 100f - (100f * (float)levenDistance / (float)originalPhrase[i].Length));
+				m_PreviousFinalResults = "[Accuracy: " + accuracy + "%] " + m_PreviousFinalResults;
+
+				speechAccuracy.Add (accuracy);
+				print (accuracy);
+
+			}
+           
 			results = m_PreviousFinalResults;
-			speechAccuracy = accuracy;
-			print (accuracy);
 			OnResult.Invoke();
-			speechAccuracy = 0;
+			speechAccuracy.Clear ();
 
         }
 
