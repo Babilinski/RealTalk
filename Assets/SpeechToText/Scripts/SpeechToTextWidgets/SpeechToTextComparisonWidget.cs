@@ -13,11 +13,13 @@ namespace UnitySpeechToText.Widgets
     public class SpeechToTextComparisonWidget : MonoBehaviour
     {
 
-  
+		public float requiredAccuracy = 30;
 		public float waitTime = 3;
 
 		public UnityEvent onStart;
 		public UnityEvent onEnd;
+		public UnityEvent onCorrect;
+		public UnityEvent onWrong;
 
         /// <summary>
         /// Store for ResponsesTimeoutInSeconds property
@@ -89,7 +91,23 @@ namespace UnitySpeechToText.Widgets
 			yield return new WaitForSeconds (waitTime);
 			OnRecordButtonClicked ();
 			print ("End Recording");
+			yield return new WaitForSeconds (2);
+			bool wasRight = false;
+
+			foreach (float f in m_SpeechToTextServiceWidgets.speechAccuracy) {
+				print (f);
+				if (f > requiredAccuracy) {
+					wasRight = true;
+					onEnd.Invoke ();
+					onCorrect.Invoke ();
+					m_SpeechToTextServiceWidgets.speechAccuracy.Clear ();
+					yield break;
+				}
+			}
+
 			onEnd.Invoke ();
+			onWrong.Invoke ();
+			m_SpeechToTextServiceWidgets.speechAccuracy.Clear ();
 			yield break;
 
 		}

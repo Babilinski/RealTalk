@@ -303,7 +303,7 @@ namespace UnitySpeechToText.Widgets
            
 			results = m_PreviousFinalResults;
 			OnResult.Invoke();
-			speechAccuracy.Clear ();
+	
 
         }
 
