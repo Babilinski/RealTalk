@@ -1,5 +1,4 @@
-﻿/*
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 using UnitySpeechToText.Utilities;
@@ -190,4 +189,3 @@ namespace UnitySpeechToText.Services
 #endif
     }
 }
-*/

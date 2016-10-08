@@ -1,5 +1,4 @@
-﻿/*
-using UnityEngine.Windows.Speech;
+﻿using UnityEngine.Windows.Speech;
 
 namespace UnitySpeechToText.Services
 {
@@ -14,4 +13,3 @@ namespace UnitySpeechToText.Services
         public ConfidenceLevel Confidence { get; set; }
     }
 }
-*/
