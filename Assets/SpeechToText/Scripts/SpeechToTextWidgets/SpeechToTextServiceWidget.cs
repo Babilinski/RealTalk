@@ -13,6 +13,8 @@ namespace UnitySpeechToText.Widgets
     public class SpeechToTextServiceWidget : MonoBehaviour
     {
        
+		public static SpeechToTextServiceWidget currentVoiceApi;
+
         /// <summary>
         /// Store for SpeechToTextService property
         /// </summary>
@@ -70,8 +72,15 @@ namespace UnitySpeechToText.Widgets
 
 		UnityEvent OnResult = new UnityEvent ();
 
+		void Awake(){
+			currentVoiceApi = this;
+		}
 
+	
+		public static SpeechToTextServiceWidget currentModule(){
 
+			return currentVoiceApi;
+		}
         /// <summary>
         /// The specific speech-to-text service to use
         /// </summary>
@@ -202,7 +211,7 @@ namespace UnitySpeechToText.Widgets
         /// the service is guaranteed to send a final result or error after or before some defined amount of time has passed.
         /// </summary>
         /// <param name="comparisonPhrase">Optional text to compare the speech-to-text result against</param>
-        public void StopRecording(string comparisonPhrase = null)
+        public void StopRecording(string comparisonPhrase)
         {
             m_ComparisonPhrase = comparisonPhrase;
             if (m_LastResultWasFinal)
@@ -273,6 +282,7 @@ namespace UnitySpeechToText.Widgets
         /// <param name="originalPhrase">The phrase to compare against</param>
         void DisplayAccuracyOfEndResults(string originalPhrase)
         {
+			print ("The computer understood " + results);
 			string speechToTextResult = StringUtilities.TrimSpecialFormatting(results, new HashSet<char>(),
                 m_LeadingCharsForSpecialWords, m_SurroundingCharsForSpecialText);
             originalPhrase = StringUtilities.TrimSpecialFormatting(originalPhrase, new HashSet<char>(),
