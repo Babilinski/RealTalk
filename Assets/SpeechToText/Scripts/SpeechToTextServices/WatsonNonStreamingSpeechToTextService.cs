@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using IBM.Watson.DeveloperCloud.Services.SpeechToText;
+using IBM.Watson.DeveloperCloud.Services.SpeechToText.v1;
 using UnityEngine;
 using UnitySpeechToText.Utilities;
 

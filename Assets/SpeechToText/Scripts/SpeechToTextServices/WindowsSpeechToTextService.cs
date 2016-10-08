@@ -1,8 +1,7 @@
-﻿using System.Collections;
+﻿/*
+using System.Collections;
 using UnityEngine;
-#if (UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WINRT || UNITY_WINRT_8_0 || UNITY_WINRT_8_1 || UNITY_WINRT_10_0)
 using UnityEngine.Windows.Speech;
-#endif
 using UnitySpeechToText.Utilities;
 
 namespace UnitySpeechToText.Services
@@ -191,3 +190,4 @@ namespace UnitySpeechToText.Services
 #endif
     }
 }
+*/
