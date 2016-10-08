@@ -76,6 +76,10 @@ namespace UnitySpeechToText.Widgets
         /// </summary>
         HashSet<SpeechToTextServiceWidget> m_WaitingSpeechToTextServiceWidgets = new HashSet<SpeechToTextServiceWidget>();
 
+
+
+		public string CheckedPhrase;
+
         /// <summary>
         /// Toggle group for sample phrases
         /// </summary>
@@ -264,20 +268,11 @@ namespace UnitySpeechToText.Widgets
             {
                 m_IsRecording = false;
 
-                // Disable all UI interaction until all responses have been received or after the specified timeout.
-                DisableAllUIInteraction();
                 m_RecordButtonImage.color = m_NotRecordingButtonColor;
                 Invoke("FinishComparisonSession", m_ResponsesTimeoutInSeconds);
 
                 // If a phrase is selected, pass it to the SpeechToTextServiceWidget.
-                string comparisonPhrase = null;
-                if (m_PhrasesToggleGroup.AnyTogglesOn())
-                {
-                    IEnumerator<Toggle> toggleEnum = m_PhrasesToggleGroup.ActiveToggles().GetEnumerator();
-                    toggleEnum.MoveNext();
-                    comparisonPhrase = toggleEnum.Current.gameObject.GetComponentInChildren<Text>().text;
-                }
-
+				string comparisonPhrase = CheckedPhrase;
                 foreach (var serviceWidget in m_SpeechToTextServiceWidgets)
                 {
                     serviceWidget.StopRecording(comparisonPhrase);
@@ -296,34 +291,8 @@ namespace UnitySpeechToText.Widgets
             if (m_IsCurrentlyInSpeechToTextSession)
             {
                 m_IsCurrentlyInSpeechToTextSession = false;
-                EnableAllUIInteraction();
             }
         }
-
-        /// <summary>
-        /// Enables interaction with the record button and phrase toggles.
-        /// </summary>
-        void EnableAllUIInteraction()
-        {
-            m_RecordButton.interactable = true;
-            m_RecordButtonTextUI.text = m_NotRecordingText;
-            foreach (var toggle in m_PhrasesToggleGroup.GetComponentsInChildren<Toggle>(true))
-            {
-                toggle.interactable = true;
-            }
-        }
-
-        /// <summary>
-        /// Disables interaction with the record button and phrase toggles.
-        /// </summary>
-        void DisableAllUIInteraction()
-        {
-            m_RecordButton.interactable = false;
-            m_RecordButtonTextUI.text = m_WaitingForResponsesText;
-            foreach (var toggle in m_PhrasesToggleGroup.GetComponentsInChildren<Toggle>())
-            {
-                toggle.interactable = false;
-            }
-        }
+			
     }
 }
