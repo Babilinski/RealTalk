@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnitySpeechToText.Services;
 using UnitySpeechToText.Utilities;
-
+using UnityEngine.Events;
 namespace UnitySpeechToText.Widgets
 {
     /// <summary>
@@ -12,55 +12,23 @@ namespace UnitySpeechToText.Widgets
     /// </summary>
     public class SpeechToTextServiceWidget : MonoBehaviour
     {
-        /// <summary>
-        /// Store for InterimTextResultColor property
-        /// </summary>
-        [SerializeField]
-        Color m_InterimTextResultColor = Color.gray;
-        /// <summary>
-        /// Store for FinalTextResultColor property
-        /// </summary>
-        [SerializeField]
-        Color m_FinalTextResultColor = Color.black;
-        /// <summary>
-        /// Store for ErrorTextColor property
-        /// </summary>
-        [SerializeField]
-        Color m_ErrorTextColor = Color.red;
+       
+		public static SpeechToTextServiceWidget currentVoiceApi;
+
         /// <summary>
         /// Store for SpeechToTextService property
         /// </summary>
         [SerializeField]
         SpeechToTextService m_SpeechToTextService;
-        /// <summary>
-        /// Store for ResultsScrollRect property
-        /// </summary>
-        [SerializeField]
-        ScrollRect m_ResultsScrollRect;
-        /// <summary>
-        /// Rectangle transform for the results scroll view content
-        /// </summary>
-        RectTransform m_ScrollViewContentRect;
+   
         /// <summary>
         /// Text UI for speech-to-text results
         /// </summary>
         Text m_ResultsTextUI;
-        /// <summary>
-        /// Combined top and bottom padding for results text
-        /// </summary>
-        float m_VerticalTextPadding;
-        /// <summary>
-        /// The height of a single line of text
-        /// </summary>
-        float m_TextLineHeight;
-        /// <summary>
-        /// The minimum height that the scroll view content rectangle can be
-        /// </summary>
-        float m_MinScrollViewContentHeight;
-        /// <summary>
-        /// Whether the initial scroll view content dimensions have been determined so the proper dimensions can be calculated
-        /// </summary>
-        bool m_ReadyToFitScrollViewContentToText;
+       
+		public string results;
+		public List<float> speechAccuracy = new List<float>(); 
+
         /// <summary>
         /// All the final results that have already been determined in the current recording session
         /// </summary>
@@ -82,7 +50,7 @@ namespace UnitySpeechToText.Widgets
         /// <summary>
         /// Text to compare the final speech-to-text result against
         /// </summary>
-        string m_ComparisonPhrase;
+        string[] m_ComparisonPhrase;
         /// <summary>
         /// Set of leading characters for words to ignore when computing accuracy, which includes '%' by default
         /// to account for Watson's "%HESITATION" in results
@@ -100,21 +68,19 @@ namespace UnitySpeechToText.Widgets
         /// <summary>
         /// Delegate for receiving the last text result
         /// </summary>
-        Action<SpeechToTextServiceWidget> m_OnReceivedLastResponse;
+		Action<SpeechToTextServiceWidget> m_OnReceivedLastResponse;
 
-        /// <summary>
-        /// Color to use for interim text results
-        /// </summary>
-        public Color InterimTextResultColor { set { m_InterimTextResultColor = value; } }
-        /// <summary>
-        /// Color to use for final text results
-        /// </summary>
-        public Color FinalTextResultColor { set { m_FinalTextResultColor = value; } }
-        /// <summary>
-        /// Color to use for errors
-        /// </summary>
-        public Color ErrorTextColor { set { m_ErrorTextColor = value; } }
+		UnityEvent OnResult = new UnityEvent ();
 
+		void Awake(){
+			currentVoiceApi = this;
+		}
+
+	
+		public static SpeechToTextServiceWidget currentModule(){
+
+			return currentVoiceApi;
+		}
         /// <summary>
         /// The specific speech-to-text service to use
         /// </summary>
@@ -127,17 +93,7 @@ namespace UnitySpeechToText.Widgets
             }
         }
 
-        /// <summary>
-        /// Scroll rectangle containing text results
-        /// </summary>
-        public ScrollRect ResultsScrollRect
-        {
-            set
-            {
-                m_ResultsScrollRect = value;
-                SetResultsScrollRectChildComponents();
-            }
-        }
+  
 
         /// <summary>
         /// Adds a function to the recording timeout delegate.
@@ -184,25 +140,10 @@ namespace UnitySpeechToText.Widgets
         void Start()
         {
             RegisterSpeechToTextServiceCallbacks();
-            SetResultsScrollRectChildComponents();
+          
         }
 
-        /// <summary>
-        /// Function that is called every frame, if the MonoBehaviour is enabled.
-        /// </summary>
-        void Update()
-        {
-            // The scroll view content dimensions are not calculated upon initialization so Update must check for this.
-            if (m_ReadyToFitScrollViewContentToText)
-            {
-                FitScrollViewContentToText();
-            }
-            else if (m_ScrollViewContentRect != null && m_ScrollViewContentRect.rect.height > 0)
-            {
-                m_MinScrollViewContentHeight = m_ScrollViewContentRect.rect.height;
-                m_ReadyToFitScrollViewContentToText = true;
-            }
-        }
+ 
 
         /// <summary>
         /// Function that is called when the MonoBehaviour will be destroyed.
@@ -211,26 +152,7 @@ namespace UnitySpeechToText.Widgets
         {
             UnregisterSpeechToTextServiceCallbacks();
         }
-
-        /// <summary>
-        /// Finds child components for the results scroll rect and assigns them to the appropriate member variables.
-        /// Also determines additional text UI member variables.
-        /// </summary>
-        void SetResultsScrollRectChildComponents()
-        {
-            if (m_ResultsScrollRect != null)
-            {
-                Transform contentTransform = m_ResultsScrollRect.GetComponent<RectTransform>().Find("Viewport/Content");
-                m_ScrollViewContentRect = contentTransform.GetComponent<RectTransform>();
-                m_ResultsTextUI = m_ScrollViewContentRect.GetComponentInChildren<Text>();
-
-                // Determine the vertical text padding and line height upon initialization
-                // so that the scroll view content rectangle can later be resized based on these.
-                m_VerticalTextPadding = m_ScrollViewContentRect.rect.height *
-                    (m_ResultsTextUI.rectTransform.anchorMin.y + 1 - m_ResultsTextUI.rectTransform.anchorMax.y);
-                m_TextLineHeight = LayoutUtility.GetPreferredHeight(m_ResultsTextUI.rectTransform);
-            }
-        }
+			
 
         /// <summary>
         /// Registers callbacks with the SpeechToTextService.
@@ -267,24 +189,7 @@ namespace UnitySpeechToText.Widgets
             return m_SpeechToTextService.GetType().ToString();
         }
 
-        /// <summary>
-        /// Resizes the scroll view content rectangle so that it can fit the results text.
-        /// </summary>
-        void FitScrollViewContentToText()
-        {
-            float textHeight = LayoutUtility.GetPreferredHeight(m_ResultsTextUI.rectTransform);
-            float parentHeight = m_ScrollViewContentRect.rect.height;
-            if (textHeight + m_VerticalTextPadding >= parentHeight)
-            {
-                m_ScrollViewContentRect.offsetMin = new Vector2(m_ScrollViewContentRect.offsetMin.x, m_ScrollViewContentRect.offsetMin.y - m_TextLineHeight);
-                m_ResultsScrollRect.verticalNormalizedPosition = 0;
-            }
-            else if (textHeight + m_VerticalTextPadding < parentHeight - m_TextLineHeight && parentHeight - m_TextLineHeight >= m_MinScrollViewContentHeight)
-            {
-                m_ScrollViewContentRect.offsetMin = new Vector2(m_ScrollViewContentRect.offsetMin.x, m_ScrollViewContentRect.offsetMin.y + m_TextLineHeight);
-                m_ResultsScrollRect.verticalNormalizedPosition = 0;
-            }
-        }
+
 
         /// <summary>
         /// Clears the current results text and tells the speech-to-text service to start recording.
@@ -296,7 +201,7 @@ namespace UnitySpeechToText.Widgets
             m_WaitingForLastFinalResultOfSession = false;
             m_LastResultWasFinal = false;
             m_PreviousFinalResults = "";
-            m_ResultsTextUI.text = m_PreviousFinalResults;
+			results = m_PreviousFinalResults;
             m_SpeechToTextService.StartRecording();
         }
 
@@ -306,7 +211,7 @@ namespace UnitySpeechToText.Widgets
         /// the service is guaranteed to send a final result or error after or before some defined amount of time has passed.
         /// </summary>
         /// <param name="comparisonPhrase">Optional text to compare the speech-to-text result against</param>
-        public void StopRecording(string comparisonPhrase = null)
+        public void StopRecording(string[] comparisonPhrase)
         {
             m_ComparisonPhrase = comparisonPhrase;
             if (m_LastResultWasFinal)
@@ -335,8 +240,7 @@ namespace UnitySpeechToText.Widgets
                 if (result.IsFinal)
                 {
                     m_PreviousFinalResults += result.TextAlternatives[0].Text;
-                    m_ResultsTextUI.color = m_FinalTextResultColor;
-                    m_ResultsTextUI.text = m_PreviousFinalResults;
+					results = m_PreviousFinalResults;
                     SmartLogger.Log(DebugFlags.SpeechToTextWidgets, m_SpeechToTextService.GetType().ToString() + " final result");
                     if (m_WaitingForLastFinalResultOfSession)
                     {
@@ -346,8 +250,8 @@ namespace UnitySpeechToText.Widgets
                 }
                 else
                 {
-                    m_ResultsTextUI.color = m_InterimTextResultColor;
-                    m_ResultsTextUI.text = m_PreviousFinalResults + result.TextAlternatives[0].Text;
+                    
+					results = m_PreviousFinalResults + result.TextAlternatives[0].Text;
                 }
             }
         }
@@ -363,7 +267,7 @@ namespace UnitySpeechToText.Widgets
             {
                 DisplayAccuracyOfEndResults(m_ComparisonPhrase);
             }
-            LogFileManager.Instance.WriteTextToFileIfShouldLog(SpeechToTextServiceString() + ": " + m_ResultsTextUI.text);
+			LogFileManager.Instance.WriteTextToFileIfShouldLog(SpeechToTextServiceString() + ": " + results);
             if (m_OnReceivedLastResponse != null)
             {
                 m_OnReceivedLastResponse(this);
@@ -376,18 +280,31 @@ namespace UnitySpeechToText.Widgets
         /// the Levenshtein Distance between the two strings, and displays this percentage in the results text UI.
         /// </summary>
         /// <param name="originalPhrase">The phrase to compare against</param>
-        void DisplayAccuracyOfEndResults(string originalPhrase)
+        void DisplayAccuracyOfEndResults(string[] originalPhrase)
         {
-            string speechToTextResult = StringUtilities.TrimSpecialFormatting(m_ResultsTextUI.text, new HashSet<char>(),
-                m_LeadingCharsForSpecialWords, m_SurroundingCharsForSpecialText);
-            originalPhrase = StringUtilities.TrimSpecialFormatting(originalPhrase, new HashSet<char>(),
+			print ("The computer understood " + results);
+			string speechToTextResult = StringUtilities.TrimSpecialFormatting(results, new HashSet<char>(),
                 m_LeadingCharsForSpecialWords, m_SurroundingCharsForSpecialText);
 
-            int levenDistance = StringUtilities.LevenshteinDistance(speechToTextResult, originalPhrase);
-            SmartLogger.Log(DebugFlags.SpeechToTextWidgets, m_SpeechToTextService.GetType().ToString() + " compute accuracy of text: \"" + speechToTextResult + "\"");
-            float accuracy = Mathf.Max(0, 100f - (100f * (float)levenDistance / (float)originalPhrase.Length));
-            m_PreviousFinalResults = "[Accuracy: " + accuracy + "%] " + m_PreviousFinalResults;
-            m_ResultsTextUI.text = m_PreviousFinalResults;
+			for (int i = 0; i < originalPhrase.Length; i++) {
+				
+				originalPhrase[i] = StringUtilities.TrimSpecialFormatting(originalPhrase[i], new HashSet<char>(),
+					m_LeadingCharsForSpecialWords, m_SurroundingCharsForSpecialText);
+
+				int levenDistance = StringUtilities.LevenshteinDistance(speechToTextResult, originalPhrase[i]);
+				SmartLogger.Log(DebugFlags.SpeechToTextWidgets, m_SpeechToTextService.GetType().ToString() + " compute accuracy of text: \"" + speechToTextResult + "\"");
+				float accuracy = Mathf.Max(0, 100f - (100f * (float)levenDistance / (float)originalPhrase[i].Length));
+				m_PreviousFinalResults = "[Accuracy: " + accuracy + "%] " + m_PreviousFinalResults;
+
+				speechAccuracy.Add (accuracy);
+				print (accuracy);
+
+			}
+           
+			results = m_PreviousFinalResults;
+			OnResult.Invoke();
+	
+
         }
 
         /// <summary>
@@ -401,8 +318,7 @@ namespace UnitySpeechToText.Widgets
             if (m_WillDisplayReceivedResults)
             {
                 m_PreviousFinalResults += "[Error: " + text + "] ";
-                m_ResultsTextUI.color = m_ErrorTextColor;
-                m_ResultsTextUI.text = m_PreviousFinalResults;
+				results = m_PreviousFinalResults;
                 if (m_WaitingForLastFinalResultOfSession)
                 {
                     m_WaitingForLastFinalResultOfSession = false;
