@@ -60,8 +60,9 @@ public class OnParkGaze : MonoBehaviour {
 		Color color = parkImage.color;
 		color.a = 0.8f;
 		parkImage.color = color;
-
+		if (hintText);
 		hintCube.SetActive (false);
+		if (hintText);
 		hintText.SetActive (false);
 	}
 

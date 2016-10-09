@@ -135,6 +135,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	IEnumerator secondQuest(Transform forrest){
 		agent.Stop ();
 		playingSound = true;
+		yield return new WaitForSeconds (3);
 		NavigateTo (forrest);
 		agent.Resume ();
 		bool teleported = false;
@@ -163,6 +164,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	}
 
 	public void AskHerForName(){
+		
 		StartCoroutine (LookAtPlayer ());
 		if (!askName) {
 			askName = true;
@@ -174,6 +176,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	}
 
 	IEnumerator WaitForGirlsName(){
+		yield return new WaitForSeconds (.5f);
 		mySource.clip = Quest [3];
 		mySource.Play ();
 		yield return new WaitUntil (() => mySource.isPlaying == false);
@@ -200,7 +203,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 	IEnumerator AskingForTheTime(){
 		
-
+		yield return new WaitForSeconds (.5f);
 		mySource.clip = Quest [4];
 		mySource.Play ();
 		yield return new WaitUntil (() => mySource.isPlaying == false);

@@ -21,8 +21,14 @@ namespace UnitySpeechToText.Widgets
 		public UnityEvent onCorrect;
 		public UnityEvent onWrong;
 
+		HashSet<char> m_LeadingCharsForSpecialWords = new HashSet<char> { '%' };
+
+		public bool man;
 
 		public bool wasTriggered;
+		public List<float> speechAccuracy = new List<float>(); 
+
+		Dictionary<char, char> m_SurroundingCharsForSpecialText = new Dictionary<char, char> { { '[', ']' } };
 
         /// <summary>
         /// Store for ResponsesTimeoutInSeconds property
@@ -103,6 +109,11 @@ namespace UnitySpeechToText.Widgets
 				return;
 
 			bool wasRight = false;
+		
+			if (man) {
+				DisplayAccuracyOfEndResults (m_SpeechToTextServiceWidgets.results);
+				return;
+			}
 
 			foreach (float f in m_SpeechToTextServiceWidgets.speechAccuracy) {
 				print (f);
@@ -115,12 +126,48 @@ namespace UnitySpeechToText.Widgets
 				}
 			}
 
+
+
 			onEnd.Invoke ();
 			if(m_SpeechToTextServiceWidgets.speechAccuracy.Exists(e => e<requiredAccuracy))
 			onWrong.Invoke ();
 			
 			m_SpeechToTextServiceWidgets.speechAccuracy.Clear ();
 			wasTriggered = false;
+		}
+
+
+
+		void DisplayAccuracyOfEndResults(string results)
+		{
+			print ("The computer understood " + results);
+			string speechToTextResult = StringUtilities.TrimSpecialFormatting(results, new HashSet<char>(),
+				m_LeadingCharsForSpecialWords, m_SurroundingCharsForSpecialText);
+
+			for (int i = 0; i < CheckedPhrase.Length; i++) {
+
+
+				int levenDistance = StringUtilities.LevenshteinDistance(speechToTextResult, CheckedPhrase[i]);
+				//SmartLogger.Log(DebugFlags.SpeechToTextWidgets, m_SpeechToTextService.GetType().ToString() + " compute accuracy of text: \"" + speechToTextResult + "\"");
+				float accuracy = Mathf.Max(0, 100f - (100f * (float)levenDistance / (float)CheckedPhrase[i].Length));
+				speechAccuracy.Add (accuracy);
+				print (accuracy);
+
+			}
+
+			foreach (float f in m_SpeechToTextServiceWidgets.speechAccuracy) {
+				print (f);
+				if (f > requiredAccuracy) {
+					onEnd.Invoke ();
+					onCorrect.Invoke ();
+					m_SpeechToTextServiceWidgets.speechAccuracy.Clear ();
+					break;
+				}
+			}
+
+
+
+
 		}
 
         /// <summary>
