@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnitySpeechToText.Widgets;
+using UnityEngine.Events;
 
 public class OnKid1Gaze : MonoBehaviour {
 
@@ -14,23 +15,14 @@ public class OnKid1Gaze : MonoBehaviour {
 	public AudioSource dogPrompt;
 	public TeleportFade teleportFadeScript;
 
+	public AudioClip wrongName;
+	public AudioClip myName;
+	public UnityEvent OnCompleteName;
+
+
+
 	public SpeechToTextComparisonWidget speechToTextComparisonWidget;
 
-	public void teleportKid() {
-		if (index == 0) {
-		//	teleportFadeScript.teleportToTransform (playerLocation, newPositionGameObject);
-			/*
-			newPosition = TeleportKid1Location.position;
-			playerLocation.position = newPosition;
-			Debug.Log (newPosition);
-			*/
-		}
-		if (index == 0) {
-			StartCoroutine (delayIndexUp (0.4f));
-			// StartCoroutine (playDialog (kid1Prompt, 1.0f));
-		}
-
-	}
 
 	public void kidPromptForTime() {
 		if (index == 0) {
@@ -39,6 +31,29 @@ public class OnKid1Gaze : MonoBehaviour {
 		}
 		Debug.Log (index);
 	}
+
+	public void GotWrongName(){
+		kid1Prompt.clip = wrongName;
+		kid1Prompt.Play ();
+
+	}
+
+	public void GotNameRight(){
+		print ("correct");
+		kid1Prompt.clip = myName;
+		kid1Prompt.Play ();
+
+	}
+
+
+	IEnumerator NameWasRight(){
+
+		yield return new WaitUntil (() => kid1Prompt.isPlaying == false);
+		OnCompleteName.Invoke ();
+	}
+
+
+
 
 	public void kidCorrectPrompt() {
 		Debug.Log ("You are correct!");

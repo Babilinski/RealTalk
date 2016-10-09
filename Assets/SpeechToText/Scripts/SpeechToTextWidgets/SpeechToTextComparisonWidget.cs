@@ -118,6 +118,7 @@ namespace UnitySpeechToText.Widgets
 			onEnd.Invoke ();
 			if(m_SpeechToTextServiceWidgets.speechAccuracy.Exists(e => e<requiredAccuracy))
 			onWrong.Invoke ();
+			
 			m_SpeechToTextServiceWidgets.speechAccuracy.Clear ();
 			wasTriggered = false;
 		}

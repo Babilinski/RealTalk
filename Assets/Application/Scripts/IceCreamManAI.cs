@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnitySpeechToText.Widgets;
+using UnityEngine.Events;
 
 public class IceCreamManAI : MonoBehaviour {
 
 	public int index = 0;
 	bool manQuestStart = false;
 	public SpeechToTextComparisonWidget speechToTextComparisonWidget;
+	public UnityEvent OnFirstAction;
 
 	[SerializeField]
 	public AudioClip[] Quest;
@@ -24,8 +26,11 @@ public class IceCreamManAI : MonoBehaviour {
 		mySource.clip = Quest[0];
 		mySource.Play ();
 		yield return new WaitUntil(() => mySource.isPlaying == false);
+		OnFirstAction.Invoke ();
 		speechToTextComparisonWidget.StartPhrase ();
 	}
+
+
 
 	public void respondFoodChoiceCorrect(){
 		mySource.clip = Quest[1];

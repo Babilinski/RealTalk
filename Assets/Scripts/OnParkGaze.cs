@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnitySpeechToText.Widgets;
+using UnityEngine.SceneManagement;
 
 public class OnParkGaze : MonoBehaviour {
 
@@ -18,7 +19,7 @@ public class OnParkGaze : MonoBehaviour {
 	public GameObject hintText;
 	public GameObject newHintCube;
 	public GameObject newHintText;
-
+	AsyncOperation a;
 	public void playInstructionsOnGaze() {
 		if (playingAudio == false && isRecording == false) {
 			StartCoroutine(PlayAudio());
@@ -64,6 +65,20 @@ public class OnParkGaze : MonoBehaviour {
 		hintText.SetActive (false);
 	}
 
+	IEnumerator Start(){
+
+
+		a = SceneManager.LoadSceneAsync("Main");
+		a.allowSceneActivation = false;
+		while (!a.isDone)
+		{
+			Debug.Log("loading " +a.progress.ToString("n2"));
+			yield return null;
+		}
+		Debug.Log("loaded!!");
+
+	}
+
 	IEnumerator PlayAudio() {
 		playingAudio = true;
 		Debug.Log ("Say 'Let's go' to begin!");
@@ -75,7 +90,7 @@ public class OnParkGaze : MonoBehaviour {
 	}
 
 	IEnumerator LoadNewSceneWithSoundConfirmation() {
-		yield return new WaitForSeconds (0.2f);
-		SceneManager.LoadScene ("Main");
+		a.allowSceneActivation = true;
+		yield  break;
 	}
 }
