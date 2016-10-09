@@ -135,7 +135,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	IEnumerator secondQuest(Transform forrest){
 		agent.Stop ();
 		playingSound = true;
-		yield return new WaitForSeconds (3);
+		yield return new WaitForSeconds (5);
 		NavigateTo (forrest);
 		agent.Resume ();
 		bool teleported = false;
