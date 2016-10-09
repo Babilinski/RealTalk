@@ -26,6 +26,8 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 	bool firstQuestStart;
 
+	bool playingSound;
+
 	public UnityEvent firstQuestComplete;
 
 	public UnityEvent secondQuestComplete;
@@ -85,7 +87,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	}
 
 	IEnumerator firstQuest(){
-
+		playingSound = true;
 		yield return new WaitUntil (() => mySource.isPlaying == false);
 
 		mySource.clip = Quest [1];
@@ -93,6 +95,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 		yield return new WaitUntil (() => mySource.isPlaying == false);
 
 		firstQuestComplete.Invoke ();
+		playingSound = false;
 	}
 	
 
@@ -105,10 +108,23 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	}
 
 	IEnumerator secondQuest(Transform forrest){
+		playingSound = true;
+		NavigateTo (forrest);
+		float time = 0;
+		while(time <= 3.5f) {
+			thisAnimation.SetBool ("Run", true);
+			time = time + Time.deltaTime;
+			yield return 0;
+		}
+		print (time);
+		thisAnimation.SetBool ("Run", false);
+		StartCoroutine (LookAtPlayer ());
+			
 		yield return new WaitUntil (() => mySource.isPlaying == false);
-		currentState = State.Simple;
-		GoToTarget (forrest);
+
+	
 		secondQuestComplete.Invoke ();
+		playingSound = false;
 
 	}
 
@@ -116,6 +132,8 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 
 	}
+
+
 
 	public void GazedAt(){
 
@@ -154,7 +172,12 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 		
 
 	public void GoToTarget(Transform target){
-	if(isSimple)
+		if(!playingSound)
+		agent.SetDestination (target.position);
+
+	}
+
+	void NavigateTo(Transform target){
 		agent.SetDestination (target.position);
 
 	}
