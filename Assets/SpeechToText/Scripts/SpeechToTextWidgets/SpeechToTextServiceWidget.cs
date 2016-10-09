@@ -72,6 +72,9 @@ namespace UnitySpeechToText.Widgets
 
 		UnityEvent OnResult = new UnityEvent ();
 
+		public static UnityEvent onRecord = new UnityEvent();
+		public static UnityEvent onEndRecording = new UnityEvent();
+
 		void Awake(){
 			currentVoiceApi = this;
 		}
@@ -203,6 +206,7 @@ namespace UnitySpeechToText.Widgets
             m_PreviousFinalResults = "";
 			results = m_PreviousFinalResults;
             m_SpeechToTextService.StartRecording();
+			onRecord.Invoke ();
         }
 
         /// <summary>
@@ -213,6 +217,7 @@ namespace UnitySpeechToText.Widgets
         /// <param name="comparisonPhrase">Optional text to compare the speech-to-text result against</param>
         public void StopRecording(string[] comparisonPhrase)
         {
+			onEndRecording.Invoke ();
             m_ComparisonPhrase = comparisonPhrase;
             if (m_LastResultWasFinal)
             {
