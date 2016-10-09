@@ -70,7 +70,8 @@ namespace UnitySpeechToText.Widgets
         /// </summary>
 		Action<SpeechToTextServiceWidget> m_OnReceivedLastResponse;
 
-		UnityEvent OnResult = new UnityEvent ();
+		[HideInInspector]
+		public UnityEvent OnResult = new UnityEvent ();
 
 		public static UnityEvent onRecord = new UnityEvent();
 		public static UnityEvent onEndRecording = new UnityEvent();
