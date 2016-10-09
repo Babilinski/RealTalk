@@ -56,6 +56,15 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 	IEnumerator AIUpdate(){
 		while (true) {
+
+			if (agent.velocity.magnitude > .28f) {
+				thisAnimation.SetBool ("Run", true);
+			} else {
+				thisAnimation.SetBool ("Run", false);
+			}
+
+
+
 			switch (currentState) {
 			case State.Simple:
 				isSimple = true;
@@ -63,7 +72,6 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 					thisAnimation.SetBool ("Run", false);
 					StartCoroutine (LookAtPlayer ());
 				
-
 				} else {
 					thisAnimation.SetBool ("Run", true);
 				}
@@ -153,6 +161,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	}
 
 	public void AskHerForName(){
+		StartCoroutine (LookAtPlayer ());
 		if (!askName) {
 			askName = true;
 			agent.Stop ();
@@ -238,7 +247,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 
 	public void GazedAt(){
-
+		if(playingSound != true)
 		thisAnimation.SetBool ("Talking", true);
 	}
 
@@ -265,7 +274,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 		Quaternion	neededRotation = Quaternion.LookRotation(targetPosition - transform.position);
 		while (transform.rotation != neededRotation) {
-			transform.rotation = Quaternion.Slerp (transform.rotation, neededRotation, Time.deltaTime / 2);
+			transform.rotation = Quaternion.Slerp (transform.rotation, neededRotation, Time.deltaTime );
 			yield return 0;
 		}
 
