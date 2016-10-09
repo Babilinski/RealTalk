@@ -10,6 +10,7 @@ public class OnParkGaze : MonoBehaviour {
 	public AudioSource letsGoAudio;
 	public bool playingAudio = false;
 	public AudioSource confirmationAudio;
+	public AudioSource notHeardAudio;
 	public SpeechToTextComparisonWidget speechToTextComparisonWidget;
 	private bool isRecording = false;
 
@@ -25,7 +26,7 @@ public class OnParkGaze : MonoBehaviour {
 	}
 
 	public void playWrongAnswerAudio() {
-		
+		notHeardAudio.Play ();
 	}
 
 	public void turnOnRecording() {
