@@ -17,8 +17,8 @@ public class TeleportFade : MonoBehaviour {
 	public void fadeOnTeleport() {
 		
 	}
-
+	/*
 	IEnumerator FadeToBlack() {
 		
-	}
+	}*/
 }
