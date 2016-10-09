@@ -5,7 +5,6 @@ using UnitySpeechToText.Widgets;
 public class IceCreamScript : MonoBehaviour {
 
 	bool iceCreamQuestStart = false;
-	public GameObject audioGameObject;
 	public AudioSource iceCreamAudio;
 
 	public void wantIceCream() {
@@ -19,5 +18,6 @@ public class IceCreamScript : MonoBehaviour {
 		//iceCreamAudio.clip = audioGameObject.transform.GetComponent<IceCreamManAI> ().Quest [15];
 		iceCreamAudio.Play ();
 		yield return new WaitUntil(() => iceCreamAudio.isPlaying == false);
+		iceCreamQuestStart = false;
 	}
 }
