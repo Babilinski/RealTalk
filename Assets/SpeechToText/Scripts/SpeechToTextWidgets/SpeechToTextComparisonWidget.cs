@@ -90,7 +90,7 @@ namespace UnitySpeechToText.Widgets
 			yield return new WaitForSeconds (waitTime);
 			OnRecordButtonClicked ();
 			print ("End Recording");
-			yield return new WaitForSeconds (2);
+			yield return new WaitForSeconds (3);
 			bool wasRight = false;
 
 			foreach (float f in m_SpeechToTextServiceWidgets.speechAccuracy) {
