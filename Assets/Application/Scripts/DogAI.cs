@@ -32,6 +32,8 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 	public UnityEvent secondQuestComplete;
 
+	public TeleportFade fade;
+
 	// Use this for initialization
 	void Start () {
 		thisAnimation = GetComponent<Animator> ();
@@ -49,7 +51,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 				if (agent.remainingDistance < .01f) {
 					thisAnimation.SetBool ("Run", false);
 					StartCoroutine (LookAtPlayer ());
-
+				
 
 				} else {
 					thisAnimation.SetBool ("Run", true);
@@ -87,6 +89,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	}
 
 	IEnumerator firstQuest(){
+		currentState = State.Talking;
 		playingSound = true;
 		yield return new WaitUntil (() => mySource.isPlaying == false);
 
@@ -101,6 +104,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 
 	public void Instructions2(Transform Forrest){
+		currentState = State.Talking;
 		mySource.clip = Quest [2];
 		mySource.Play ();
 		StartCoroutine (secondQuest (Forrest));
@@ -108,15 +112,19 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	}
 
 	IEnumerator secondQuest(Transform forrest){
+		agent.Stop ();
 		playingSound = true;
 		NavigateTo (forrest);
+		agent.Resume ();
 		float time = 0;
+
+		fade.teleportToTransform (player, forrest.GetChild(0));
 		while(time <= 3.5f) {
 			thisAnimation.SetBool ("Run", true);
 			time = time + Time.deltaTime;
 			yield return 0;
 		}
-		print (time);
+	
 		thisAnimation.SetBool ("Run", false);
 		StartCoroutine (LookAtPlayer ());
 			
@@ -172,8 +180,11 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 		
 
 	public void GoToTarget(Transform target){
-		if(!playingSound)
-		agent.SetDestination (target.position);
+		if (!playingSound) {
+			currentState = State.Simple;
+			agent.SetDestination (target.position);
+
+		}
 
 	}
 
