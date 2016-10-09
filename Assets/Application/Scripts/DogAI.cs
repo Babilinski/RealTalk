@@ -25,12 +25,23 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	AudioSource mySource;
 
 	bool firstQuestStart;
+	bool askName;
 
 	bool playingSound;
 
 	public UnityEvent firstQuestComplete;
 
 	public UnityEvent secondQuestComplete;
+
+	public UnityEvent askHerNameComplete;
+	public UnityEvent askNameWasWrong;
+	public UnityEvent askNameWasCorrect;
+
+	public UnityEvent nowAskForTime;
+
+
+	bool NameWasCorrect;
+
 
 	public TeleportFade fade;
 
@@ -141,9 +152,87 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 	}
 
-	public void HowAreYou(){
+	public void AskHerForName(){
+		if (!askName) {
+			askName = true;
+			agent.Stop ();
+			playingSound = true;
+			StartCoroutine (WaitForGirlsName ());
+		}
+
+	}
+
+	IEnumerator WaitForGirlsName(){
+		mySource.clip = Quest [3];
+		mySource.Play ();
+		yield return new WaitUntil (() => mySource.isPlaying == false);
+		askHerNameComplete.Invoke ();
+
+		while (NameWasCorrect != true) {
+
+			yield return new WaitForSeconds (10f);
+			if (NameWasCorrect)
+				yield break;
+				askHerNameComplete.Invoke ();
+			yield return 0;
+		}
+			
+	
+
+	}
+
+	public void NowAskForTime(){
+		NameWasCorrect = true;
+		StartCoroutine (AskingForTheTime());
+	}
 
 
+	IEnumerator AskingForTheTime(){
+		
+
+		mySource.clip = Quest [4];
+		mySource.Play ();
+		yield return new WaitUntil (() => mySource.isPlaying == false);
+		yield return new WaitForSeconds (1);
+		nowAskForTime.Invoke ();
+
+
+	}
+
+
+	public void LetsGetIcecream(){
+
+		StartCoroutine (TalkAboutIcecream ());
+	}
+
+	IEnumerator TalkAboutIcecream(){
+
+		mySource.clip = Quest [5];
+		mySource.Play ();
+		yield return new WaitUntil (() => mySource.isPlaying == false);
+		agent.Stop ();
+		playingSound = true;
+		GameObject forrest = GameObject.FindGameObjectWithTag ("IceCream");
+		NavigateTo (forrest.transform);
+		agent.Resume ();
+		bool teleported = false;
+		float time = 0;
+
+
+		while(time <= 3.5f) {
+			thisAnimation.SetBool ("Run", true);
+			if (time > 2.4f && teleported == false) {
+				fade.teleportToTransform (player, forrest.transform.GetChild(0));
+				teleported = true;
+			}
+			time = time + Time.deltaTime;
+			yield return 0;
+		}
+
+	}
+
+	public void AnswerNameWasCorrect(){
+		NameWasCorrect = true;
 	}
 
 
