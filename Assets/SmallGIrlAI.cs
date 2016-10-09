@@ -36,6 +36,8 @@ public class SmallGIrlAI : MonoBehaviour {
 		TryTime = true;
 		yield return new WaitUntil (() => mySource.isPlaying == false);
 		OnSaidName.Invoke ();
+		TryTime = true;
+		StartCoroutine (KeepTrying ());
 	}
 
 	public void AskForTime(){
@@ -43,27 +45,32 @@ public class SmallGIrlAI : MonoBehaviour {
 	}
 
 	public void AskForTimeAgain(){
-		if (TryTime) {
-			StartCoroutine (WaitForResponce ());
-		}
+		return;
 	}
 
 
-	IEnumerator WaitForResponce(){
-		while (TryTime = true) {
+
+
+	public void ClickOnher(){
+
+		//OnSaidName.Invoke ();
+	}
+
+
+	IEnumerator KeepTrying(){
+		while (TryTime) {
+			if (TryTime != true)
+				yield break;
 
 			yield return new WaitForSeconds (10);
 			if (TryTime != true)
 				yield break;
+
 			OnSaidName.Invoke ();
-			yield return 0;
+
+
 		}
 
-	}
-
-	public void ClickOnher(){
-
-		OnSaidName.Invoke ();
 	}
 
 	IEnumerator StartSayingTime(){

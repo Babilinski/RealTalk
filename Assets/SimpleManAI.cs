@@ -10,6 +10,11 @@ public class SimpleManAI : MonoBehaviour {
 
 	public UnityEvent OnDoneIntro;
 
+
+	void Start(){
+		mySource = GetComponent<AudioSource> ();
+
+	}
 	public void StartBuying(){
 		StartCoroutine (SayItems ());
 

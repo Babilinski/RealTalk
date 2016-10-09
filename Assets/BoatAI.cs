@@ -5,6 +5,8 @@ public class BoatAI : MonoBehaviour {
 
 	Animator myAnimator;
 
+
+
 	// Use this for initialization
 	void Start () {
 	
