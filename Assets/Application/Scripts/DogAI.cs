@@ -32,6 +32,8 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 	public UnityEvent secondQuestComplete;
 
+	public TeleportFade fade;
+
 	// Use this for initialization
 	void Start () {
 		thisAnimation = GetComponent<Animator> ();
@@ -108,15 +110,19 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 	}
 
 	IEnumerator secondQuest(Transform forrest){
+		agent.Stop ();
 		playingSound = true;
 		NavigateTo (forrest);
+		agent.Resume ();
 		float time = 0;
+
+		fade.teleportToTransform (player, forrest.GetChild(0));
 		while(time <= 3.5f) {
 			thisAnimation.SetBool ("Run", true);
 			time = time + Time.deltaTime;
 			yield return 0;
 		}
-		print (time);
+	
 		thisAnimation.SetBool ("Run", false);
 		StartCoroutine (LookAtPlayer ());
 			

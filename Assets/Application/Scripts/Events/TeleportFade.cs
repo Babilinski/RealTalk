@@ -4,6 +4,8 @@ using System.Collections;
 public class TeleportFade : MonoBehaviour {
 
 	public void teleportToTransform(Transform playerPosition, Transform newPosition) {
-		playerPosition.position = newPosition.position;
+		Vector3 TempPos = newPosition.position;
+		TempPos.y = playerPosition.position.y;
+		playerPosition.position = TempPos;
 	}
 }
