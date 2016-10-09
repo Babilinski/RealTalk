@@ -116,11 +116,16 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 		playingSound = true;
 		NavigateTo (forrest);
 		agent.Resume ();
+		bool teleported = false;
 		float time = 0;
 
-		fade.teleportToTransform (player, forrest.GetChild(0));
+	
 		while(time <= 3.5f) {
 			thisAnimation.SetBool ("Run", true);
+			if (time > 2.4f && teleported == false) {
+				fade.teleportToTransform (player, forrest.GetChild(0));
+				teleported = true;
+			}
 			time = time + Time.deltaTime;
 			yield return 0;
 		}
