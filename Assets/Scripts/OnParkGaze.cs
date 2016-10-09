@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnitySpeechToText.Widgets;
 
 public class OnParkGaze : MonoBehaviour {
 
@@ -9,6 +10,7 @@ public class OnParkGaze : MonoBehaviour {
 	public AudioSource letsGoAudio;
 	public bool playingAudio = false;
 	public AudioSource confirmationAudio;
+	public SpeechToTextComparisonWidget speechToTextComparisonWidget;
 
 	public void playInstructionsOnGaze() {
 		if (playingAudio == false) {
@@ -39,10 +41,10 @@ public class OnParkGaze : MonoBehaviour {
 		yield return new WaitForSeconds(letsGoAudio.clip.length);
 		playingAudio = false;
 
+		speechToTextComparisonWidget.StartPhrase ();
 	}
 
 	IEnumerator LoadNewSceneWithSoundConfirmation() {
-		confirmationAudio.Play ();
 		yield return new WaitForSeconds (confirmationAudio.clip.length);
 		SceneManager.LoadScene ("Main");
 	}
