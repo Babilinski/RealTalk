@@ -21,6 +21,9 @@ namespace UnitySpeechToText.Widgets
 		public UnityEvent onCorrect;
 		public UnityEvent onWrong;
 
+
+		public bool wasTriggered;
+
         /// <summary>
         /// Store for ResponsesTimeoutInSeconds property
         /// </summary>
@@ -74,7 +77,7 @@ namespace UnitySpeechToText.Widgets
         {
 			m_SpeechToTextServiceWidgets = Object.FindObjectOfType (typeof(SpeechToTextServiceWidget)) as SpeechToTextServiceWidget;
             RegisterSpeechToTextServiceWidgetsCallbacks();
-
+			m_SpeechToTextServiceWidgets.OnResult.AddListener (() => GotResults ());
 
         }
 
@@ -84,13 +87,21 @@ namespace UnitySpeechToText.Widgets
 
 		}
 
+
+
 		IEnumerator StartRecordingTimer(){
+			wasTriggered = true;
 			print ("Start");
 			OnRecordButtonClicked ();
 			yield return new WaitForSeconds (waitTime);
 			OnRecordButtonClicked ();
-			print ("End Recording");
-			yield return new WaitForSeconds (3);
+
+		}
+
+		public void GotResults(){
+			if (wasTriggered != true)
+				return;
+
 			bool wasRight = false;
 
 			foreach (float f in m_SpeechToTextServiceWidgets.speechAccuracy) {
@@ -100,17 +111,15 @@ namespace UnitySpeechToText.Widgets
 					onEnd.Invoke ();
 					onCorrect.Invoke ();
 					m_SpeechToTextServiceWidgets.speechAccuracy.Clear ();
-					yield break;
+					break;
 				}
 			}
 
 			onEnd.Invoke ();
 			onWrong.Invoke ();
 			m_SpeechToTextServiceWidgets.speechAccuracy.Clear ();
-			yield break;
-
+			wasTriggered = false;
 		}
-
 
         /// <summary>
         /// Function that is called when the MonoBehaviour will be destroyed.
