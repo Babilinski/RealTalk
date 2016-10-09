@@ -18,7 +18,7 @@ public class OnKid1Gaze : MonoBehaviour {
 
 	public void teleportKid() {
 		if (index == 0) {
-			teleportFadeScript.teleportToTransform (playerLocation, newPositionGameObject);
+		//	teleportFadeScript.teleportToTransform (playerLocation, newPositionGameObject);
 			/*
 			newPosition = TeleportKid1Location.position;
 			playerLocation.position = newPosition;
@@ -33,8 +33,9 @@ public class OnKid1Gaze : MonoBehaviour {
 	}
 
 	public void kidPromptForTime() {
-		if (index == 1) {
+		if (index == 0) {
 			StartCoroutine(delayStartRecording(dogPrompt, 0.5f));
+			index = 1;
 		}
 		Debug.Log (index);
 	}
