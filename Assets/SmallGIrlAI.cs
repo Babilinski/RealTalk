@@ -9,6 +9,10 @@ public class SmallGIrlAI : MonoBehaviour {
 	public UnityEvent OnSaidName;
 	public UnityEvent OnSaidTime;
 
+	bool TryTime;
+
+
+
 
 	void Start(){
 
@@ -29,6 +33,7 @@ public class SmallGIrlAI : MonoBehaviour {
 	IEnumerator StartSayingName(){
 		mySource.clip = myAudios [1];
 		mySource.Play ();
+		TryTime = true;
 		yield return new WaitUntil (() => mySource.isPlaying == false);
 		OnSaidName.Invoke ();
 	}
@@ -37,7 +42,32 @@ public class SmallGIrlAI : MonoBehaviour {
 		StartCoroutine (StartSayingTime ());
 	}
 
+	public void AskForTimeAgain(){
+		if (TryTime) {
+			StartCoroutine (WaitForResponce ());
+		}
+	}
+
+
+	IEnumerator WaitForResponce(){
+		while (TryTime = true) {
+
+			yield return new WaitForSeconds (10);
+			if (TryTime != true)
+				yield break;
+			OnSaidName.Invoke ();
+			yield return 0;
+		}
+
+	}
+
+	public void ClickOnher(){
+
+		OnSaidName.Invoke ();
+	}
+
 	IEnumerator StartSayingTime(){
+		TryTime = false;
 		mySource.clip = myAudios [2];
 		mySource.Play ();
 		yield return new WaitUntil (() => mySource.isPlaying == false);

@@ -39,6 +39,8 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 
 	public UnityEvent nowAskForTime;
 
+	public UnityEvent GotToIce;
+
 
 	bool NameWasCorrect;
 
@@ -232,6 +234,7 @@ public class DogAI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler{
 			thisAnimation.SetBool ("Run", true);
 			if (time > 2.4f && teleported == false) {
 				fade.teleportToTransform (player, forrest.transform.GetChild(0));
+				GotToIce.Invoke ();
 				teleported = true;
 			}
 			time = time + Time.deltaTime;
