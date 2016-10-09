@@ -11,11 +11,29 @@ public class OnParkGaze : MonoBehaviour {
 	public bool playingAudio = false;
 	public AudioSource confirmationAudio;
 	public SpeechToTextComparisonWidget speechToTextComparisonWidget;
+	private bool isRecording = false;
+
+	public GameObject hintCube;
+	public GameObject hintText;
+	public GameObject newHintCube;
+	public GameObject newHintText;
 
 	public void playInstructionsOnGaze() {
-		if (playingAudio == false) {
+		if (playingAudio == false && isRecording == false) {
 			StartCoroutine(PlayAudio());
 		}
+	}
+
+	public void playWrongAnswerAudio() {
+		
+	}
+
+	public void turnOnRecording() {
+		isRecording = true;
+	}
+
+	public void turnOffRecording() {
+		isRecording = false;
 	}
 
 	public void startParkScene() {
@@ -26,12 +44,23 @@ public class OnParkGaze : MonoBehaviour {
 		Color color = parkImage.color;
 		color.a = 1.0f;
 		parkImage.color = color;
+
+		hintCube.SetActive (true);
+		hintText.SetActive (true);
+
+		//newHintCube = Instantiate (hintCube, new Vector3(0.03f, 0.39f, 1.685f), Quaternion.identity) as GameObject;
+		//newHintText = Instantiate (hintText, new Vector3 (0.076f, 0.44f, 1.5f), Quaternion.identity) as GameObject;
+		Debug.Log (newHintCube);
+
 	}
 
 	public void dimImage () {
 		Color color = parkImage.color;
 		color.a = 0.8f;
 		parkImage.color = color;
+
+		hintCube.SetActive (false);
+		hintText.SetActive (false);
 	}
 
 	IEnumerator PlayAudio() {
@@ -45,7 +74,7 @@ public class OnParkGaze : MonoBehaviour {
 	}
 
 	IEnumerator LoadNewSceneWithSoundConfirmation() {
-		yield return new WaitForSeconds (confirmationAudio.clip.length);
+		yield return new WaitForSeconds (0.2f);
 		SceneManager.LoadScene ("Main");
 	}
 }
